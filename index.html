@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Modify Table with Popup</title>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+  <link rel="stylesheet" href="css.css" />
+</head>
+<body>
+
+  <div id="container">
+    <h3>Student Record</h3>
+    <table id="studentTable" style="width:100%">
+      <tr>
+        <th>Name</th>
+        <th>ID</th>
+        <th>Marks</th>
+      </tr>
+    </table>
+
+    <h4>Add New Record</h4>
+    Name: <input type="text" id="name" />
+    ID: <input type="text" id="id" />
+    Marks: <input type="text" id="marks" />
+    <button id="addBtn">Add</button>
+
+    <h4>Modify Record</h4>
+    Enter ID: <input type="text" id="mod-id" />
+    <button id="modifyBtn">Modify</button>
+  </div>
+
+  <div id="overlay"></div>
+  <div id="popup">
+    <h4>Edit Record</h4>
+    Name: <input type="text" id="popup-name" /><br />
+    Marks: <input type="text" id="popup-marks" /><br /><br />
+    <button id="updateBtn">Update</button>
+    <button onclick="closePopup()">Cancel</button>
+  </div>
+
+  <script>
+    let editRow = null;
+
+    $('#addBtn').click(function () {
+      const name = $('#name').val().trim();
+      const id = $('#id').val().trim();
+      const marks = $('#marks').val().trim();
+
+      if (name && id && marks) {
+        $('#studentTable').append(`
+          <tr data-id="${id}">
+            <td>${name}</td>
+            <td>${id}</td>
+            <td>${marks}</td>
+          </tr>
+        `);
+        $('#name').val(''); $('#id').val(''); $('#marks').val('');
+      } else {
+        alert("All fields are required!");
+      }
+    });
+
+    $('#modifyBtn').click(function () {
+      const id = $('#mod-id').val().trim();
+      if (!id) return alert("Enter ID to modify");
+
+      const row = $(`#studentTable tr[data-id="${id}"]`);
+      if (row.length === 0) {
+        alert("ID not found!");
+        return;
+      }
+
+      editRow = row;
+      $('#popup-name').val(row.find('td').eq(0).text());
+      $('#popup-marks').val(row.find('td').eq(2).text());
+
+      $('#overlay').show();
+      $('#popup').show();
+    });
+
+    $('#updateBtn').click(function () {
+      const newName = $('#popup-name').val().trim();
+      const newMarks = $('#popup-marks').val().trim();
+
+      if (editRow && newName && newMarks) {
+        editRow.find('td').eq(0).text(newName);
+        editRow.find('td').eq(2).text(newMarks);
+        closePopup();
+      } else {
+        alert("Both fields are required!");
+      }
+    });
+
+    function closePopup() {
+      $('#popup').hide();
+      $('#overlay').hide();
+      editRow = null;
+    }
+  </script>
+
+</body>
+</html>
